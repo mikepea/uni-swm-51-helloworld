@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<!--
+Build file for Helloworld application
+-->
+
+<project name="helloworld" default="ear" basedir=".">
+
+
+   <!-- ================================================================== -->
+   <!-- Initialization of all property settings                            -->
+   <!-- ================================================================== -->
+
+   <target name="init">
+      <property name="app.name"       value="helloworld"                    />
+      <property name="ear.name"       value="${app.name}"                  />
+      <property name="web.name"       value="${ear.name}-web"              />
+      <property name="bld.dir"        value="./build"                        />
+      <property name="src.dir"        value="./src"                        />
+      <property name="src.web.dir"    value="./web"                        />
+      <property name="etc.dir"        value="./etc"                        />
+      <property name="lib.dir"        value="./lib"                        />
+
+      <property name="bld.ear.dir"    value="${bld.dir}/${ear.name}"              />
+      <property name="bld.web.dir"    value="${bld.dir}/${web.name}"              />
+
+      <property name="ORACLE_HOME" value="${oracle.home}"/>
+      <property name="J2EE_HOME" value="${ORACLE_HOME}/j2ee/home"/>
+
+      <property name="build.compiler" value="classic"          />
+
+      <property name="base.lib"       value="${J2EE_HOME}/lib" />
+      <property name="oc4j.jar"       value="${J2EE_HOME}/oc4j.jar" />
+      <property name="web.classpath"  value="${base.lib}\servlet.jar:${oc4j.jar}:${base.lib}\ejb.jar" />
+  </target>
+
+  <target name="clean" depends="init">
+	  <delete dir="${bld.dir}" />
+	  <delete dir="${lib.dir}" />
+  </target>
+  
+  <!-- ================================================================== -->
+  <!-- Make sure that directory structure is in place                     -->
+  <!-- ================================================================== -->
+
+   <target name = "prepare" depends = "init">
+
+      <mkdir dir="${bld.dir}" />
+      <mkdir dir="${lib.dir}" />
+
+      <mkdir dir="${bld.ear.dir}"  />
+      <mkdir dir="${bld.ear.dir}/META-INF"  />
+      <mkdir dir="${bld.web.dir}"  />
+      <mkdir dir="${bld.web.dir}/WEB-INF"  />
+      <mkdir dir="${bld.web.dir}/WEB-INF/classes"  />
+   </target>
+
+
+   <!-- ================================================================== -->
+   <!-- Compilation of the web part of the application                     -->
+   <!-- ================================================================== -->
+
+   <target name="web-classes" depends="prepare">
+      <javac srcdir="${src.dir}"
+         destdir="${bld.web.dir}/WEB-INF/classes"
+         includes="*.java"
+         classpath="${web.classpath}" />
+   </target>
+
+   <target name="web-inf" depends="prepare">
+      <copy file="etc/web.xml"
+            tofile="${bld.web.dir}/WEB-INF/web.xml" />
+      <copy todir="${bld.web.dir}">
+        <fileset dir=".">
+          <include name="*.html" />
+          <include name="*.htm" />
+          <include name="*.jsp" />
+        </fileset>
+      </copy>
+   </target>
+
+   <target name="war" depends="web-classes,web-inf">
+       <jar jarfile="${lib.dir}/${web.name}.war">
+         <fileset dir="${bld.web.dir}" includes= "**" />
+       </jar>
+   </target>
+
+   <target name="j2ee-descriptor" depends="prepare">
+	   <copy todir = "${bld.ear.dir}/META-INF">
+       <fileset dir="${etc.dir}" includes="application.xml" />
+     </copy>
+   </target>
+
+   <target name="ear" depends ="war,j2ee-descriptor">
+      <jar jarfile="${lib.dir}/${ear.name}.ear">
+        <fileset dir="${lib.dir}" includes="${web.name}.war" />
+	<fileset dir="${bld.ear.dir}" includes="META-INF/application.xml" /> 
+      </jar>
+   </target>
+</project>

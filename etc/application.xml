@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE application PUBLIC "-//Sun Microsystems, Inc.//DTD J2EE Application 1.2//EN" "http://java.sun.com/j2ee/dtds/application_1_2.dtd">
+<application>
+
+  <display-name>j2ee_Servlet</display-name>
+
+  <description>
+     A simple J2EE servlet 
+  </description>
+
+  <module>
+    <web>
+      <web-uri>helloworld-web.war</web-uri>
+      <context-root>/hiWorld</context-root>
+    </web>
+  </module>
+</application>
